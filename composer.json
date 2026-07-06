@@ -1,0 +1,42 @@
+{
+    "name": "tatun55/nawate",
+    "version": "0.1.0",
+    "description": "Nawate — signed-URL state switching for manual demo/verification in Laravel apps. Recipe-based state, per-session SQLite isolation, zero host-app pollution.",
+    "type": "library",
+    "license": "proprietary",
+    "keywords": ["laravel", "nawate", "demo", "qa", "state-switching"],
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0|^13.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tatun55\\Nawate\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tatun55\\Nawate\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Tatun55\\Nawate\\NawateServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
