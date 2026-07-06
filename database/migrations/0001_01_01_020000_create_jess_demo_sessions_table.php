@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('nawate_demo_sessions', function (Blueprint $table) {
+        Schema::create('jess_demo_sessions', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
             $table->string('recipe');
@@ -25,6 +25,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('nawate_demo_sessions');
+        Schema::dropIfExists('jess_demo_sessions');
     }
 };

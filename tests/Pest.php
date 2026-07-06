@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use SparrowhawkLabs\Nawate\Tests\TestCase;
+use SparrowhawkLabs\Jess\Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)

@@ -1,12 +1,12 @@
 {
-    "name": "sparrowhawk-labs/nawate",
-    "description": "Nawate — signed-URL state switching for manual demo/verification in Laravel apps. Recipe-based state, per-session SQLite isolation, zero host-app pollution.",
+    "name": "sparrowhawk-labs/jess",
+    "description": "Jess — signed-URL state switching for manual demo/verification in Laravel apps. Recipe-based state, per-session SQLite isolation, zero host-app pollution.",
     "type": "library",
     "license": "MIT",
     "homepage": "https://sparrowhawk-labs.dev",
     "support": {
-        "issues": "https://github.com/sparrowhawk-labs/nawate/issues",
-        "source": "https://github.com/sparrowhawk-labs/nawate"
+        "issues": "https://github.com/sparrowhawk-labs/jess/issues",
+        "source": "https://github.com/sparrowhawk-labs/jess"
     },
     "authors": [
         {
@@ -16,7 +16,7 @@
             "role": "Developer"
         }
     ],
-    "keywords": ["laravel", "nawate", "demo", "qa", "state-switching", "sparrowhawk-labs"],
+    "keywords": ["laravel", "jess", "demo", "qa", "state-switching", "sparrowhawk-labs"],
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0|^13.0"
@@ -28,18 +28,18 @@
     },
     "autoload": {
         "psr-4": {
-            "SparrowhawkLabs\\Nawate\\": "src/"
+            "SparrowhawkLabs\\Jess\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SparrowhawkLabs\\Nawate\\Tests\\": "tests/"
+            "SparrowhawkLabs\\Jess\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "SparrowhawkLabs\\Nawate\\NawateServiceProvider"
+                "SparrowhawkLabs\\Jess\\JessServiceProvider"
             ]
         }
     },

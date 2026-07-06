@@ -1,4 +1,4 @@
-# nawate
+# jess
 
 Signed-URL state switching for manual demo/verification in Laravel apps. Hit a
 link, land on the target screen already in the exact state you asked for —
@@ -7,19 +7,19 @@ zero pollution of host app code.
 ## Stack
 
 - PHP 8.2+ / Laravel 12+
-- SQLite — **required for the demo/QA environment nawate runs in**, regardless
+- SQLite — **required for the demo/QA environment jess runs in**, regardless
   of what your production database is. See "Requirements" below before
   assuming this fits your app.
 
 ## Requirements
 
-nawate's isolation trick (instant, cheap, per-session copies) works by
+jess's isolation trick (instant, cheap, per-session copies) works by
 literally `copy()`-ing a SQLite file and repointing `database.default` at the
-copy. That means **while a nawate demo session is active, the whole app runs
+copy. That means **while a jess demo session is active, the whole app runs
 against a SQLite connection** — not whatever your production database engine
 is.
 
-- Your **production** database can be MySQL, PostgreSQL, anything — nawate
+- Your **production** database can be MySQL, PostgreSQL, anything — jess
   never touches it (`enabled` defaults to `false`, and even when on, it only
   swaps the connection during an active demo session).
 - Your **demo/QA environment's schema and queries must run correctly on
@@ -27,20 +27,20 @@ is.
   same reason Laravel's own test tooling defaults to SQLite). Code that
   relies on engine-specific SQL — MySQL JSON operators, `FULLTEXT` search,
   stored procedures, engine-specific collations — will not work through
-  nawate as-is.
+  jess as-is.
 - There is currently no MySQL/PostgreSQL-native provisioning backend (e.g.
   clone-database-and-switch-connection). If your demo data path genuinely
-  can't run on SQLite, nawate isn't a fit yet.
+  can't run on SQLite, jess isn't a fit yet.
 
 ## Installation
 
 ```bash
-composer require sparrowhawk-labs/nawate
-php artisan nawate:install
+composer require sparrowhawk-labs/jess
+php artisan jess:install
 ```
 
-`nawate:install` publishes config + runs migrations + publishes docs, in two
-layers meant to make nawate legible to LLM coding agents as well as humans:
+`jess:install` publishes config + runs migrations + publishes docs, in two
+layers meant to make jess legible to LLM coding agents as well as humans:
 
 - **Core layer** — the essentials (API, ordering rules, footguns) are
   appended directly into the host app's **`AGENTS.md`** (created if
@@ -49,12 +49,12 @@ layers meant to make nawate legible to LLM coding agents as well as humans:
   without duplicating it (Claude Code reads `CLAUDE.md`, not `AGENTS.md`,
   unless it's imported this way — other AGENTS.md-convention tools read
   `AGENTS.md` directly).
-- **Reference layer** — this file, published as **`docs/nawate/README.md`**
+- **Reference layer** — this file, published as **`docs/jess/README.md`**
   in the host app. Everything below "Status" is the reference layer:
   full API, config, internals, fragment design patterns, and
   troubleshooting.
 
-Both steps are idempotent (safe to re-run `nawate:install`) and can be
+Both steps are idempotent (safe to re-run `jess:install`) and can be
 skipped with `--no-docs`.
 
 ## Status
@@ -69,7 +69,7 @@ this repository for the full development log and verification history.
 
 ```php
 // app/Providers/AppServiceProvider.php
-use SparrowhawkLabs\Nawate\Facades\Nawate;
+use SparrowhawkLabs\Jess\Facades\Jess;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\PurchaseSeeder;
 
@@ -77,17 +77,17 @@ public function boot(): void
 {
     // Fragment order in a link's recipe must respect FK dependencies —
     // see "Fragment design" below.
-    Nawate::fragment('user:new', fn () => UserSeeder::asNewUser());
-    Nawate::fragment('user:repeat', fn () => UserSeeder::asRepeatCustomer());
-    Nawate::fragment('purchase:completed', fn () => PurchaseSeeder::afterCompleted());
+    Jess::fragment('user:new', fn () => UserSeeder::asNewUser());
+    Jess::fragment('user:repeat', fn () => UserSeeder::asRepeatCustomer());
+    Jess::fragment('purchase:completed', fn () => PurchaseSeeder::afterCompleted());
 }
 ```
 
 ```php
 // wherever you build the link to hand someone (a route, a controller, tinker, …)
-use SparrowhawkLabs\Nawate\Facades\Nawate;
+use SparrowhawkLabs\Jess\Facades\Jess;
 
-$url = Nawate::link(
+$url = Jess::link(
     fragments: ['user:repeat', 'purchase:completed'],
     redirectTo: '/shop',
     userId: UserSeeder::DEMO_USER_ID, // logs this user in after provisioning
@@ -102,36 +102,36 @@ Hitting `$url`:
 4. Redirects to `$redirectTo`, with a cookie binding this browser to this
    demo session for the rest of its lifetime.
 
-## Config reference (`config/nawate.php`)
+## Config reference (`config/jess.php`)
 
 | Key | Env var | Default | Meaning |
 |---|---|---|---|
-| `enabled` | `NAWATE_ENABLED` | `false` | Master switch. No route, no middleware, no exception handling registered at all unless `true`. Set only in local/staging/demo. |
-| `signed_url_ttl` | `NAWATE_SIGNED_URL_TTL` | `60` | Minutes a `Nawate::link()` URL stays valid before Laravel's signed-URL check rejects it. |
-| `demo_db_storage_path` | `NAWATE_DEMO_DB_STORAGE_PATH` | `app/nawate/demo-sessions` | Where per-session SQLite copies are written. Relative to `storage_path()` unless absolute. |
-| `template_db_path` | `NAWATE_TEMPLATE_DB_PATH` | *(none — required)* | Absolute path to a migrated, **empty-of-demo-data** SQLite file. You own keeping this in sync with your schema (see below). |
-| `connection` | `NAWATE_CONNECTION` | `nawate_demo` | The DB connection name nawate registers and repoints at each session's file. Kept out of your own connection names — fragments/Seeders never reference it. |
-| `cleanup_after_hours` | `NAWATE_CLEANUP_AFTER_HOURS` | `24` | Sessions older than this are eligible for `nawate:cleanup`. |
+| `enabled` | `JESS_ENABLED` | `false` | Master switch. No route, no middleware, no exception handling registered at all unless `true`. Set only in local/staging/demo. |
+| `signed_url_ttl` | `JESS_SIGNED_URL_TTL` | `60` | Minutes a `Jess::link()` URL stays valid before Laravel's signed-URL check rejects it. |
+| `demo_db_storage_path` | `JESS_DEMO_DB_STORAGE_PATH` | `app/jess/demo-sessions` | Where per-session SQLite copies are written. Relative to `storage_path()` unless absolute. |
+| `template_db_path` | `JESS_TEMPLATE_DB_PATH` | *(none — required)* | Absolute path to a migrated, **empty-of-demo-data** SQLite file. You own keeping this in sync with your schema (see below). |
+| `connection` | `JESS_CONNECTION` | `jess_demo` | The DB connection name jess registers and repoints at each session's file. Kept out of your own connection names — fragments/Seeders never reference it. |
+| `cleanup_after_hours` | `JESS_CLEANUP_AFTER_HOURS` | `24` | Sessions older than this are eligible for `jess:cleanup`. |
 
 ### Preparing the template DB
 
-nawate does not own your migrations — it copies a file you prepare:
+jess does not own your migrations — it copies a file you prepare:
 
 ```bash
 # after `php artisan migrate` against a normal empty DB (sqlite example)
-cp database/database.sqlite storage/app/nawate/template.sqlite
+cp database/database.sqlite storage/app/jess/template.sqlite
 ```
 
 Re-copy it any time your schema changes. There's no automatic drift
 detection — this is a manual step, documented here rather than automated,
 since "automatically re-migrate a file in production" is exactly the kind
-of implicit magic nawate avoids.
+of implicit magic jess avoids.
 
 ## Fragment design
 
-A **fragment** is a name plus a closure (`Nawate::fragment($name, $callback)`)
+A **fragment** is a name plus a closure (`Jess::fragment($name, $callback)`)
 that mutates the demo DB — typically by delegating to your own Seeder's
-static methods. Nawate never decides what a fragment does; it only decides
+static methods. Jess never decides what a fragment does; it only decides
 *when* (during provisioning, against the isolated copy) and *in what order*
 (the order given in a recipe's `$fragments` array).
 
@@ -160,29 +160,29 @@ Two rules follow directly from that design:
    }
    ```
 
-   `Nawate::link(fragments: [...], redirectTo: '/shop', userId: UserSeeder::DEMO_USER_ID)`
+   `Jess::link(fragments: [...], redirectTo: '/shop', userId: UserSeeder::DEMO_USER_ID)`
    then reliably logs in as the user the fragment just created, because the
    ID is forced rather than left to auto-increment.
 
 A worked example of this pattern (3-axis EC demo — user type × purchase
-status × cart contents) lives in the sibling `nawate-demo-app` project built
+status × cart contents) lives in the sibling `jess-demo-app` project built
 during Phase 5 verification.
 
 ## How it works (internals)
 
-- **Signed link → recipe.** `Nawate::link()` doesn't look anything up
+- **Signed link → recipe.** `Jess::link()` doesn't look anything up
   server-side; it encodes the whole recipe (fragment names, `$userId`,
   `$redirectTo`) as the token itself
-  (`SparrowhawkLabs\Nawate\Support\StateRecipe::toToken()`/`fromToken()`), then wraps
+  (`SparrowhawkLabs\Jess\Support\StateRecipe::toToken()`/`fromToken()`), then wraps
   it in a Laravel `temporarySignedRoute`. Laravel's own HMAC-over-the-URL is
   what makes tampering detectable — the token's opacity is not a security
   boundary by itself.
-- **Provisioning.** Hitting the link (`NawateStateController`) copies
+- **Provisioning.** Hitting the link (`JessStateController`) copies
   `template_db_path` to a new UUID-named file under
-  `demo_db_storage_path`, points the `nawate.connection` (default
-  `nawate_demo`) at that copy, runs the recipe's fragments against it, then
-  records a `nawate_demo_sessions` row (uuid, recipe label, file path,
-  `expires_at`) — all via `SparrowhawkLabs\Nawate\Services\DemoSessionManager`.
+  `demo_db_storage_path`, points the `jess.connection` (default
+  `jess_demo`) at that copy, runs the recipe's fragments against it, then
+  records a `jess_demo_sessions` row (uuid, recipe label, file path,
+  `expires_at`) — all via `SparrowhawkLabs\Jess\Services\DemoSessionManager`.
 - **The connection switch itself.** `DB::purge($connection)` +
   `config(['database.connections.<connection>.database' => $path])` +
   `config(['database.default' => $connection])`, restored to whatever was
@@ -193,14 +193,14 @@ during Phase 5 verification.
   Octane-style persistent workers). Host app code never needs to reference
   the connection name.
 - **Staying switched across requests.** The controller sets a
-  `nawate_session` cookie holding the session UUID. A `SwitchDemoConnection`
-  middleware (pushed onto the `web` group, only while `nawate.enabled`)
+  `jess_session` cookie holding the session UUID. A `SwitchDemoConnection`
+  middleware (pushed onto the `web` group, only while `jess.enabled`)
   reads that cookie on every subsequent request and re-activates the same
   session's connection — so a redirect chain, or simply browsing around
   after landing, keeps seeing the demo data instead of snapping back to the
   host app's real DB.
 - **Expired/tampered links.** Laravel's `InvalidSignatureException` is
-  caught and replaced, scoped only to the `nawate.state` route, with a plain
+  caught and replaced, scoped only to the `jess.state` route, with a plain
   Japanese explanation page (403) instead of the framework default.
 
 ### The session-driver gotcha
@@ -211,9 +211,9 @@ middleware pipeline `StartSession` runs. Because `SwitchDemoConnection` is
 appended to the *end* of the `web` group, a request can start reading its
 session against the host's real DB and finish writing it against the demo
 DB (or vice-versa on the next request) — the two can desync across
-requests. This was found empirically during Phase 5's `nawate-demo-app`
+requests. This was found empirically during Phase 5's `jess-demo-app`
 verification. **Fix:** use a non-DB session driver (`file` is the simplest)
-in every environment where `nawate.enabled` is true. Nawate itself does not
+in every environment where `jess.enabled` is true. Jess itself does not
 enforce or auto-switch this — it's a host-app config choice.
 
 ### Known unverified edges
@@ -222,7 +222,7 @@ Carried over from the original design risk log (`PLAN.md`), still open:
 
 - Behavior inside queued jobs (a job dispatched while the demo connection is
   active, then processed by a separate worker process).
-  Nawate targets ordinary synchronous request/response demo/QA — job queues
+  Jess targets ordinary synchronous request/response demo/QA — job queues
   are out of scope for now.
 - A real Octane (persistent-worker) deployment. The connection-switch
   mechanism was verified against a *simplified* multi-switch simulation in
@@ -230,11 +230,11 @@ Carried over from the original design risk log (`PLAN.md`), still open:
 
 ## Cleanup
 
-Expired demo sessions (SQLite copy + `nawate_demo_sessions` row) are removed by:
+Expired demo sessions (SQLite copy + `jess_demo_sessions` row) are removed by:
 
 ```bash
-php artisan nawate:cleanup          # deletes what's past expires_at
-php artisan nawate:cleanup --dry-run  # lists what would be removed, deletes nothing
+php artisan jess:cleanup          # deletes what's past expires_at
+php artisan jess:cleanup --dry-run  # lists what would be removed, deletes nothing
 ```
 
 Nothing runs this automatically — wire it into your own schedule. Two common ways:
@@ -243,17 +243,17 @@ Nothing runs this automatically — wire it into your own schedule. Two common w
 // bootstrap/app.php (or routes/console.php) — host app's own Schedule
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('nawate:cleanup')->hourly();
+Schedule::command('jess:cleanup')->hourly();
 ```
 
 ```bash
 # or, outside the app entirely (launchd/cron), if you'd rather not touch the host's schedule:
-0 * * * * cd /path/to/app && php artisan nawate:cleanup >> storage/logs/nawate-cleanup.log 2>&1
+0 * * * * cd /path/to/app && php artisan jess:cleanup >> storage/logs/jess-cleanup.log 2>&1
 ```
 
 ## Safety
 
-No route is registered at all in production unless `NAWATE_ENABLED` is
+No route is registered at all in production unless `JESS_ENABLED` is
 explicitly set to `true` (disabled by default, opt-in only). Signed URLs otherwise carry no
 authentication of their own — anyone who obtains a link's URL can use it
 (impersonation risk is the tradeoff for zero host-app-code integration).
@@ -270,8 +270,8 @@ locale falls back to `config('app.fallback_locale')` per normal Laravel
 behavior. To add a language or override wording:
 
 ```bash
-php artisan vendor:publish --tag=nawate-lang
-# edit lang/vendor/nawate/{locale}/messages.php
+php artisan vendor:publish --tag=jess-lang
+# edit lang/vendor/jess/{locale}/messages.php
 ```
 
 ## Troubleshooting
@@ -295,6 +295,6 @@ php artisan vendor:publish --tag=nawate-lang
   `MATCH`/`AGAINST` FULLTEXT search, a JSON operator, a stored procedure
   `CALL`, …) — see "Requirements" above; that fragment's query needs a
   SQLite-compatible rewrite (e.g. `RAND()` → `RANDOM()`) to run through
-  nawate at all. Without that specific signature, treat it as an ordinary
+  jess at all. Without that specific signature, treat it as an ordinary
   bug in the fragment — the exception's `getPrevious()` has the original
   exception if you need to inspect it further.

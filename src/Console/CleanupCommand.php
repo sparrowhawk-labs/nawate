@@ -1,27 +1,27 @@
 <?php
 
-namespace SparrowhawkLabs\Nawate\Console;
+namespace SparrowhawkLabs\Jess\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class CleanupCommand extends Command
 {
-    protected $signature = 'nawate:cleanup
+    protected $signature = 'jess:cleanup
                             {--dry-run : List what would be removed without deleting anything}';
 
-    protected $description = 'Delete expired nawate demo sessions (SQLite copy + bookkeeping row).';
+    protected $description = 'Delete expired jess demo sessions (SQLite copy + bookkeeping row).';
 
     public function handle(): int
     {
         $dryRun = (bool) $this->option('dry-run');
 
-        $expired = DB::table('nawate_demo_sessions')
+        $expired = DB::table('jess_demo_sessions')
             ->where('expires_at', '<=', now())
             ->get();
 
         if ($expired->isEmpty()) {
-            $this->info('No expired nawate demo sessions.');
+            $this->info('No expired jess demo sessions.');
 
             return self::SUCCESS;
         }
@@ -37,7 +37,7 @@ class CleanupCommand extends Command
                 unlink($row->demo_db_path);
             }
 
-            DB::table('nawate_demo_sessions')->where('id', $row->id)->delete();
+            DB::table('jess_demo_sessions')->where('id', $row->id)->delete();
             $this->line("removed {$row->uuid}");
         }
 

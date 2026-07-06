@@ -1,14 +1,14 @@
 <?php
 
-namespace SparrowhawkLabs\Nawate\Http\Middleware;
+namespace SparrowhawkLabs\Jess\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use SparrowhawkLabs\Nawate\Services\DemoSessionManager;
+use SparrowhawkLabs\Jess\Services\DemoSessionManager;
 
 /**
- * Runs on every 'web' request (only while nawate.enabled). Reads the demo
- * session cookie left by NawateStateController and re-activates that
+ * Runs on every 'web' request (only while jess.enabled). Reads the demo
+ * session cookie left by JessStateController and re-activates that
  * session's DB connection, so a *redirected* request — not just the initial
  * signed-link hit — keeps seeing the demo data. Silently no-ops (host app
  * behaves normally) when there's no cookie or the session has expired.
@@ -22,7 +22,7 @@ class SwitchDemoConnection
 
     public function handle(Request $request, Closure $next)
     {
-        $uuid = $request->cookie('nawate_session');
+        $uuid = $request->cookie('jess_session');
 
         if (is_string($uuid) && $uuid !== '') {
             $session = $this->sessions->find($uuid);

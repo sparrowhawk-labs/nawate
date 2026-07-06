@@ -1,11 +1,11 @@
 <?php
 
-namespace SparrowhawkLabs\Nawate\Support;
+namespace SparrowhawkLabs\Jess\Support;
 
 use InvalidArgumentException;
 
 /**
- * What a signed nawate link asks for: which fragments to compose, whom to
+ * What a signed jess link asks for: which fragments to compose, whom to
  * log in as, and where to land after provisioning.
  */
 final class StateRecipe
@@ -21,7 +21,7 @@ final class StateRecipe
     }
 
     /**
-     * Encode as the `{token}` route segment of a nawate signed link. The
+     * Encode as the `{token}` route segment of a jess signed link. The
      * token carries the recipe itself (no server-side lookup table) — the
      * `signed` middleware's HMAC over the full URL is what makes tampering
      * with it detectable, not the token's opacity.
@@ -44,7 +44,7 @@ final class StateRecipe
         $data = $json === false ? null : json_decode($json, true);
 
         if (! is_array($data) || ! isset($data['f'], $data['r']) || ! is_array($data['f'])) {
-            throw new InvalidArgumentException('Invalid nawate state token.');
+            throw new InvalidArgumentException('Invalid jess state token.');
         }
 
         return new self(

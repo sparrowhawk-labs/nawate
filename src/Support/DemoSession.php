@@ -1,12 +1,12 @@
 <?php
 
-namespace SparrowhawkLabs\Nawate\Support;
+namespace SparrowhawkLabs\Jess\Support;
 
 use DateTimeInterface;
 
 /**
  * A provisioned, per-session SQLite copy with the requested fragments
- * already applied — the record persisted in `nawate_demo_sessions`.
+ * already applied — the record persisted in `jess_demo_sessions`.
  */
 final class DemoSession
 {

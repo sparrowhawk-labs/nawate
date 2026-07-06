@@ -4,9 +4,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use SparrowhawkLabs\Nawate\Facades\Nawate;
+use SparrowhawkLabs\Jess\Facades\Jess;
 
-class NawateTestUser extends Authenticatable
+class JessTestUser extends Authenticatable
 {
     protected $table = 'users';
 
@@ -14,10 +14,10 @@ class NawateTestUser extends Authenticatable
 }
 
 beforeEach(function () {
-    config(['auth.providers.users.model' => NawateTestUser::class]);
+    config(['auth.providers.users.model' => JessTestUser::class]);
 
     // Stand-in for "the host app's actual /cart route" — plain host code,
-    // no awareness of nawate at all.
+    // no awareness of jess at all.
     Route::middleware('web')->get('/cart', function () {
         return response()->json([
             'authenticated_as' => Auth::id(),
@@ -25,7 +25,7 @@ beforeEach(function () {
         ]);
     });
 
-    Nawate::fragment('user:repeat_customer', function () {
+    Jess::fragment('user:repeat_customer', function () {
         DB::table('users')->where('id', 1)->update([
             'name' => 'Alice',
             'is_repeat_customer' => 1,
@@ -33,8 +33,8 @@ beforeEach(function () {
     });
 });
 
-test('a signed nawate link provisions, switches, logs in, and lands on the target screen', function () {
-    $url = Nawate::link(['user:repeat_customer'], '/cart', userId: 1);
+test('a signed jess link provisions, switches, logs in, and lands on the target screen', function () {
+    $url = Jess::link(['user:repeat_customer'], '/cart', userId: 1);
 
     $this->get($url)->assertRedirect('/cart');
 
@@ -47,7 +47,7 @@ test('a signed nawate link provisions, switches, logs in, and lands on the targe
 });
 
 test('a tampered link is rejected with a plain-language message in the app locale (default: English)', function () {
-    $url = Nawate::link(['user:repeat_customer'], '/cart', userId: 1) . 'x';
+    $url = Jess::link(['user:repeat_customer'], '/cart', userId: 1) . 'x';
 
     $this->get($url)
         ->assertStatus(403)
@@ -57,7 +57,7 @@ test('a tampered link is rejected with a plain-language message in the app local
 test('the expired-link page follows config(app.locale) — Japanese when set', function () {
     config(['app.locale' => 'ja']);
 
-    $url = Nawate::link(['user:repeat_customer'], '/cart', userId: 1) . 'x';
+    $url = Jess::link(['user:repeat_customer'], '/cart', userId: 1) . 'x';
 
     $this->get($url)
         ->assertStatus(403)
@@ -66,7 +66,7 @@ test('the expired-link page follows config(app.locale) — Japanese when set', f
 
 test('an expired link is rejected the same way', function () {
     $this->travelTo(now()->subMinutes(120));
-    $url = Nawate::link(['user:repeat_customer'], '/cart', userId: 1);
+    $url = Jess::link(['user:repeat_customer'], '/cart', userId: 1);
     $this->travelBack();
 
     $this->get($url)->assertStatus(403);

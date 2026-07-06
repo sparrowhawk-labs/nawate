@@ -1,18 +1,18 @@
 <?php
 
-namespace SparrowhawkLabs\Nawate\Tests;
+namespace SparrowhawkLabs\Jess\Tests;
 
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\TestCase as Orchestra;
 use PDO;
-use SparrowhawkLabs\Nawate\NawateServiceProvider;
+use SparrowhawkLabs\Jess\JessServiceProvider;
 
 class TestCase extends Orchestra
 {
     protected function getPackageProviders($app): array
     {
         return [
-            NawateServiceProvider::class,
+            JessServiceProvider::class,
         ];
     }
 
@@ -24,7 +24,7 @@ class TestCase extends Orchestra
      */
     protected function tearDown(): void
     {
-        $connection = (string) config('nawate.connection', 'nawate_demo');
+        $connection = (string) config('jess.connection', 'jess_demo');
         DB::purge($connection);
         config(['database.default' => 'testing']);
 
@@ -43,9 +43,9 @@ class TestCase extends Orchestra
 
         $app['config']->set('app.key', 'base64:' . base64_encode(random_bytes(32)));
 
-        $app['config']->set('nawate.enabled', true);
-        $app['config']->set('nawate.template_db_path', $this->makeTemplateDatabase());
-        $app['config']->set('nawate.demo_db_storage_path', sys_get_temp_dir() . '/nawate-tests-' . uniqid());
+        $app['config']->set('jess.enabled', true);
+        $app['config']->set('jess.template_db_path', $this->makeTemplateDatabase());
+        $app['config']->set('jess.demo_db_storage_path', sys_get_temp_dir() . '/jess-tests-' . uniqid());
 
         $app['config']->set('session.driver', 'array');
         $app['config']->set('auth.defaults.guard', 'web');
@@ -63,7 +63,7 @@ class TestCase extends Orchestra
      */
     private function makeTemplateDatabase(): string
     {
-        $path = sys_get_temp_dir() . '/nawate-template-' . uniqid() . '.sqlite';
+        $path = sys_get_temp_dir() . '/jess-template-' . uniqid() . '.sqlite';
         touch($path);
 
         $pdo = new PDO('sqlite:' . $path);

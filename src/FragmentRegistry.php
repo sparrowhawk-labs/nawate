@@ -1,12 +1,12 @@
 <?php
 
-namespace SparrowhawkLabs\Nawate;
+namespace SparrowhawkLabs\Jess;
 
 use Closure;
 use InvalidArgumentException;
 
 /**
- * Holds the host app's fragment name → Seeder-invoking closure map. Nawate
+ * Holds the host app's fragment name → Seeder-invoking closure map. Jess
  * never decides how a fragment is applied — it only stores the pointer the
  * host app registered (blueprint-flow "Seeder single source" — see PLAN.md).
  */
@@ -28,7 +28,7 @@ class FragmentRegistry
     public function get(string $name): Closure
     {
         if (! $this->has($name)) {
-            throw new InvalidArgumentException("Nawate fragment [{$name}] is not registered.");
+            throw new InvalidArgumentException("Jess fragment [{$name}] is not registered.");
         }
 
         return $this->fragments[$name];

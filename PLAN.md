@@ -28,6 +28,13 @@
 > と同一パターン）。以降のこのドキュメント内の `tatun55/nawate` 表記は当時の記録としてそのまま
 > 残す（歴史的事実の書き換えはしない）。
 
+> **2026-07-07 追記**: `pinion-ui`/`pinion-icons`（鷹狩り由来の "pinion" 命名）に揃える形で、
+> パッケージ名を `nawate` → `jess` に改名（`jess` = 鷹狩りで鷹の脚に結ぶ革紐。訓練中の鷹を
+> 係留し、呼び戻せるようにする道具）。`sparrowhawk-labs/nawate` → `sparrowhawk-labs/jess`、
+> namespace `SparrowhawkLabs\Nawate\` → `SparrowhawkLabs\Jess\`、facade `Nawate` → `Jess`、
+> config/route/接続名/cookie名/artisan コマンド等すべて `nawate:*` → `jess:*` に統一。以降この
+> ドキュメント内の `nawate` 表記（本節より上）は当時の記録としてそのまま残す。
+
 ---
 
 ## 確定済みの設計判断（前段の会話で合意）

@@ -1,23 +1,23 @@
 <?php
 
-namespace SparrowhawkLabs\Nawate\Console;
+namespace SparrowhawkLabs\Jess\Console;
 
 use Illuminate\Console\Command;
 
 class InstallCommand extends Command
 {
-    protected $signature = 'nawate:install
+    protected $signature = 'jess:install
                             {--force : Overwrite existing config file}
                             {--no-migrate : Skip running migrations}
                             {--no-docs : Skip publishing docs and the AGENTS.md/CLAUDE.md wiring}';
 
-    protected $description = 'Install nawate: publish config, run migrations, publish two-layer agent docs.';
+    protected $description = 'Install jess: publish config, run migrations, publish two-layer agent docs.';
 
     public function handle(): int
     {
         $this->info('Publishing config...');
         $this->call('vendor:publish', [
-            '--tag' => 'nawate-config',
+            '--tag' => 'jess-config',
             '--force' => (bool) $this->option('force'),
         ]);
 
@@ -29,7 +29,7 @@ class InstallCommand extends Command
         if (! $this->option('no-docs')) {
             $this->info('Publishing docs...');
             $this->call('vendor:publish', [
-                '--tag' => 'nawate-docs',
+                '--tag' => 'jess-docs',
                 '--force' => true,
             ]);
             $this->ensureAgentsMdCore();
@@ -37,25 +37,25 @@ class InstallCommand extends Command
         }
 
         $this->newLine();
-        $this->info('nawate installed.');
-        $this->line('  1. Set NAWATE_ENABLED=true in .env for local/staging/demo environments only.');
-        $this->line('  2. Register state recipes from your AppServiceProvider — see AGENTS.md / docs/nawate/README.md.');
-        $this->line('  - Override config: php artisan vendor:publish --tag=nawate-config --force');
+        $this->info('jess installed.');
+        $this->line('  1. Set JESS_ENABLED=true in .env for local/staging/demo environments only.');
+        $this->line('  2. Register state recipes from your AppServiceProvider — see AGENTS.md / docs/jess/README.md.');
+        $this->line('  - Override config: php artisan vendor:publish --tag=jess-config --force');
 
         return self::SUCCESS;
     }
 
     /**
-     * Append nawate's core-info block to the host app's AGENTS.md (created if
+     * Append jess's core-info block to the host app's AGENTS.md (created if
      * missing) — the cross-tool convention file most coding agents other than
-     * Claude Code read natively. Idempotent via the `nawate:core:start` marker.
+     * Claude Code read natively. Idempotent via the `jess:core:start` marker.
      */
     private function ensureAgentsMdCore(): void
     {
         $path = base_path('AGENTS.md');
         $existing = is_file($path) ? file_get_contents($path) : '';
 
-        if (str_contains($existing, '<!-- nawate:core:start -->')) {
+        if (str_contains($existing, '<!-- jess:core:start -->')) {
             $this->line('AGENTS.md core section already present.');
 
             return;
@@ -68,7 +68,7 @@ class InstallCommand extends Command
             : rtrim($existing) . "\n\n" . $block;
 
         file_put_contents($path, $content);
-        $this->info('Added nawate core section to AGENTS.md.');
+        $this->info('Added jess core section to AGENTS.md.');
     }
 
     /**

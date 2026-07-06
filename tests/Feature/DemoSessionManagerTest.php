@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
-use SparrowhawkLabs\Nawate\Facades\Nawate;
-use SparrowhawkLabs\Nawate\Services\DemoSessionManager;
-use SparrowhawkLabs\Nawate\Support\StateRecipe;
+use SparrowhawkLabs\Jess\Facades\Jess;
+use SparrowhawkLabs\Jess\Services\DemoSessionManager;
+use SparrowhawkLabs\Jess\Support\StateRecipe;
 
 test('provision copies the template, applies fragments, and records a session', function () {
-    Nawate::fragment('user:repeat_customer', function () {
+    Jess::fragment('user:repeat_customer', function () {
         DB::table('users')->where('id', 1)->update([
             'name' => 'Alice',
             'is_repeat_customer' => 1,
@@ -26,7 +26,7 @@ test('provision copies the template, applies fragments, and records a session', 
     expect(config('database.default'))->toBe($originalDefault);
 
     // Bookkeeping row lives on the host's real connection.
-    $row = DB::table('nawate_demo_sessions')->where('uuid', $session->uuid)->first();
+    $row = DB::table('jess_demo_sessions')->where('uuid', $session->uuid)->first();
     expect($row)->not->toBeNull();
     expect($row->recipe)->toBe('user:repeat_customer');
     expect($row->demo_db_path)->toBe($session->sqlitePath);
@@ -39,7 +39,7 @@ test('provision copies the template, applies fragments, and records a session', 
 });
 
 test('activate() points the runtime default connection at the session db for the rest of the request', function () {
-    Nawate::fragment('user:vip', function () {
+    Jess::fragment('user:vip', function () {
         DB::table('users')->where('id', 1)->update(['name' => 'VIP User']);
     });
 
@@ -48,7 +48,7 @@ test('activate() points the runtime default connection at the session db for the
 
     $manager->activate($session);
 
-    expect(config('database.default'))->toBe(config('nawate.connection'));
+    expect(config('database.default'))->toBe(config('jess.connection'));
     expect(DB::table('users')->where('id', 1)->value('name'))->toBe('VIP User');
     // (TestCase::tearDown() restores the default connection after this test —
     // activate() intentionally leaves the switch in place for a real request.)
@@ -62,7 +62,7 @@ test('unregistered fragment name throws instead of silently no-op-ing', function
 });
 
 test('a fragment calling a MySQL-only function fails with a clear, attributed error', function () {
-    Nawate::fragment('search:rand', function () {
+    Jess::fragment('search:rand', function () {
         // RAND() is MySQL's random function (SQLite's equivalent is
         // RANDOM()) — SQLite has no function by this name, so this
         // reproduces "wrote MySQL-only SQL into a fragment" without
@@ -75,7 +75,7 @@ test('a fragment calling a MySQL-only function fails with a clear, attributed er
     try {
         $manager->provision(new StateRecipe(fragments: ['search:rand']));
         $this->fail('Expected FragmentExecutionException to be thrown.');
-    } catch (\SparrowhawkLabs\Nawate\Exceptions\FragmentExecutionException $e) {
+    } catch (\SparrowhawkLabs\Jess\Exceptions\FragmentExecutionException $e) {
         expect($e->getMessage())->toContain("fragment 'search:rand'");
         expect($e->getMessage())->toContain('MySQL/PostgreSQL-specific SQL feature');
         expect($e->getMessage())->toContain('RAND');
@@ -84,7 +84,7 @@ test('a fragment calling a MySQL-only function fails with a clear, attributed er
 });
 
 test('a fragment with an ordinary bug still throws its original exception type via the wrapper', function () {
-    Nawate::fragment('broken:typo', function () {
+    Jess::fragment('broken:typo', function () {
         DB::table('no_such_table_at_all')->insert(['x' => 1]);
     });
 
@@ -93,7 +93,7 @@ test('a fragment with an ordinary bug still throws its original exception type v
     try {
         $manager->provision(new StateRecipe(fragments: ['broken:typo']));
         $this->fail('Expected FragmentExecutionException to be thrown.');
-    } catch (\SparrowhawkLabs\Nawate\Exceptions\FragmentExecutionException $e) {
+    } catch (\SparrowhawkLabs\Jess\Exceptions\FragmentExecutionException $e) {
         // No "no such function" signature here, so no engine-incompatibility
         // guess is appended — the original DB error still comes through.
         expect($e->getMessage())->toContain("fragment 'broken:typo'");

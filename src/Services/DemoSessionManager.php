@@ -1,15 +1,15 @@
 <?php
 
-namespace SparrowhawkLabs\Nawate\Services;
+namespace SparrowhawkLabs\Jess\Services;
 
 use Closure;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
-use SparrowhawkLabs\Nawate\Exceptions\FragmentExecutionException;
-use SparrowhawkLabs\Nawate\FragmentRegistry;
-use SparrowhawkLabs\Nawate\Support\DemoSession;
-use SparrowhawkLabs\Nawate\Support\StateRecipe;
+use SparrowhawkLabs\Jess\Exceptions\FragmentExecutionException;
+use SparrowhawkLabs\Jess\FragmentRegistry;
+use SparrowhawkLabs\Jess\Support\DemoSession;
+use SparrowhawkLabs\Jess\Support\StateRecipe;
 
 /**
  * Provisions per-session demo SQLite copies and switches the runtime default
@@ -25,28 +25,28 @@ class DemoSessionManager
 
     public function provision(StateRecipe $recipe): DemoSession
     {
-        $templatePath = (string) config('nawate.template_db_path');
+        $templatePath = (string) config('jess.template_db_path');
 
         if ($templatePath === '' || ! is_file($templatePath)) {
             throw new RuntimeException(
-                "nawate.template_db_path is not configured or the file is missing: [{$templatePath}]"
+                "jess.template_db_path is not configured or the file is missing: [{$templatePath}]"
             );
         }
 
         $storageDir = $this->storageDir();
 
         if (! is_dir($storageDir) && ! mkdir($storageDir, 0755, true) && ! is_dir($storageDir)) {
-            throw new RuntimeException("Could not create nawate demo DB storage directory: [{$storageDir}]");
+            throw new RuntimeException("Could not create jess demo DB storage directory: [{$storageDir}]");
         }
 
         $uuid = (string) Str::uuid();
         $targetPath = $storageDir . '/' . $uuid . '.sqlite';
 
         if (! copy($templatePath, $targetPath)) {
-            throw new RuntimeException("Could not copy nawate template DB to [{$targetPath}]");
+            throw new RuntimeException("Could not copy jess template DB to [{$targetPath}]");
         }
 
-        $connection = (string) config('nawate.connection', 'nawate_demo');
+        $connection = (string) config('jess.connection', 'jess_demo');
         $originalDefault = (string) config('database.default');
 
         // Apply fragments against the new file while it's the default
@@ -69,9 +69,9 @@ class DemoSessionManager
         });
 
         $recipeLabel = implode(',', $recipe->fragments);
-        $expiresAt = now()->addHours((int) config('nawate.cleanup_after_hours', 24));
+        $expiresAt = now()->addHours((int) config('jess.cleanup_after_hours', 24));
 
-        DB::connection($originalDefault)->table('nawate_demo_sessions')->insert([
+        DB::connection($originalDefault)->table('jess_demo_sessions')->insert([
             'uuid' => $uuid,
             'recipe' => $recipeLabel,
             'demo_db_path' => $targetPath,
@@ -90,7 +90,7 @@ class DemoSessionManager
      */
     public function find(string $uuid): ?DemoSession
     {
-        $row = DB::table('nawate_demo_sessions')
+        $row = DB::table('jess_demo_sessions')
             ->where('uuid', $uuid)
             ->where('expires_at', '>', now())
             ->first();
@@ -111,7 +111,7 @@ class DemoSessionManager
      */
     public function activate(DemoSession $session): void
     {
-        $connection = (string) config('nawate.connection', 'nawate_demo');
+        $connection = (string) config('jess.connection', 'jess_demo');
         $this->configureConnection($connection, $session->sqlitePath);
         config(['database.default' => $connection]);
     }
@@ -145,7 +145,7 @@ class DemoSessionManager
 
     private function storageDir(): string
     {
-        $configured = (string) config('nawate.demo_db_storage_path');
+        $configured = (string) config('jess.demo_db_storage_path');
 
         return str_starts_with($configured, '/')
             ? $configured

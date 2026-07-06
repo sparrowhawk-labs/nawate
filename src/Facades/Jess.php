@@ -1,11 +1,11 @@
 <?php
 
-namespace SparrowhawkLabs\Nawate\Facades;
+namespace SparrowhawkLabs\Jess\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\URL;
-use SparrowhawkLabs\Nawate\FragmentRegistry;
-use SparrowhawkLabs\Nawate\Support\StateRecipe;
+use SparrowhawkLabs\Jess\FragmentRegistry;
+use SparrowhawkLabs\Jess\Support\StateRecipe;
 
 /**
  * @method static void fragment(string $name, \Closure $callback)
@@ -15,7 +15,7 @@ use SparrowhawkLabs\Nawate\Support\StateRecipe;
  *
  * @see FragmentRegistry
  */
-class Nawate extends Facade
+class Jess extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
@@ -33,8 +33,8 @@ class Nawate extends Facade
         $recipe = new StateRecipe(fragments: $fragments, userId: $userId, redirectTo: $redirectTo);
 
         return URL::temporarySignedRoute(
-            'nawate.state',
-            now()->addMinutes((int) config('nawate.signed_url_ttl', 60)),
+            'jess.state',
+            now()->addMinutes((int) config('jess.signed_url_ttl', 60)),
             ['token' => $recipe->toToken()],
         );
     }
