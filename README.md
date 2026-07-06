@@ -7,12 +7,35 @@ zero pollution of host app code.
 ## Stack
 
 - PHP 8.2+ / Laravel 12+
-- SQLite (per-session template copies; independent of the host app's default connection)
+- SQLite — **required for the demo/QA environment nawate runs in**, regardless
+  of what your production database is. See "Requirements" below before
+  assuming this fits your app.
+
+## Requirements
+
+nawate's isolation trick (instant, cheap, per-session copies) works by
+literally `copy()`-ing a SQLite file and repointing `database.default` at the
+copy. That means **while a nawate demo session is active, the whole app runs
+against a SQLite connection** — not whatever your production database engine
+is.
+
+- Your **production** database can be MySQL, PostgreSQL, anything — nawate
+  never touches it (`enabled` defaults to `false`, and even when on, it only
+  swaps the connection during an active demo session).
+- Your **demo/QA environment's schema and queries must run correctly on
+  SQLite**. Ordinary Eloquent + standard migrations usually do (this is the
+  same reason Laravel's own test tooling defaults to SQLite). Code that
+  relies on engine-specific SQL — MySQL JSON operators, `FULLTEXT` search,
+  stored procedures, engine-specific collations — will not work through
+  nawate as-is.
+- There is currently no MySQL/PostgreSQL-native provisioning backend (e.g.
+  clone-database-and-switch-connection). If your demo data path genuinely
+  can't run on SQLite, nawate isn't a fit yet.
 
 ## Installation
 
 ```bash
-composer require tatun55/nawate
+composer require sparrowhawk-labs/nawate
 php artisan nawate:install
 ```
 
@@ -46,7 +69,7 @@ this repository for the full development log and verification history.
 
 ```php
 // app/Providers/AppServiceProvider.php
-use Tatun55\Nawate\Facades\Nawate;
+use SparrowhawkLabs\Nawate\Facades\Nawate;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\PurchaseSeeder;
 
@@ -62,7 +85,7 @@ public function boot(): void
 
 ```php
 // wherever you build the link to hand someone (a route, a controller, tinker, …)
-use Tatun55\Nawate\Facades\Nawate;
+use SparrowhawkLabs\Nawate\Facades\Nawate;
 
 $url = Nawate::link(
     fragments: ['user:repeat', 'purchase:completed'],
@@ -150,7 +173,7 @@ during Phase 5 verification.
 - **Signed link → recipe.** `Nawate::link()` doesn't look anything up
   server-side; it encodes the whole recipe (fragment names, `$userId`,
   `$redirectTo`) as the token itself
-  (`Tatun55\Nawate\Support\StateRecipe::toToken()`/`fromToken()`), then wraps
+  (`SparrowhawkLabs\Nawate\Support\StateRecipe::toToken()`/`fromToken()`), then wraps
   it in a Laravel `temporarySignedRoute`. Laravel's own HMAC-over-the-URL is
   what makes tampering detectable — the token's opacity is not a security
   boundary by itself.
@@ -159,7 +182,7 @@ during Phase 5 verification.
   `demo_db_storage_path`, points the `nawate.connection` (default
   `nawate_demo`) at that copy, runs the recipe's fragments against it, then
   records a `nawate_demo_sessions` row (uuid, recipe label, file path,
-  `expires_at`) — all via `Tatun55\Nawate\Services\DemoSessionManager`.
+  `expires_at`) — all via `SparrowhawkLabs\Nawate\Services\DemoSessionManager`.
 - **The connection switch itself.** `DB::purge($connection)` +
   `config(['database.connections.<connection>.database' => $path])` +
   `config(['database.default' => $connection])`, restored to whatever was

@@ -5,4 +5,5 @@ Laravel package: signed-URL state switching for manual demo/verification (per-se
 - Development plan / phase status / completed-condition verification log: [PLAN.md](PLAN.md)
 - Run tests: `composer install && ./vendor/bin/pest` (Pest + orchestra/testbench, real HTTP request cycles via testbench)
 - Throwaway spike code (DB connection-switch mechanism verification, kept intentionally, not part of the package): `spike/`
-- Package namespace: `Tatun55\Nawate\`; facade `Nawate` (`fragment()`, `link()`); core service `DemoSessionManager` (`src/Services/DemoSessionManager.php`)
+- Composer package: `sparrowhawk-labs/nawate`; PHP namespace `SparrowhawkLabs\Nawate\`; facade `Nawate` (`fragment()`, `link()`); core service `DemoSessionManager` (`src/Services/DemoSessionManager.php`)
+- MIT-licensed, OSS under Sparrowhawk Labs (renamed from `tatun55/nawate` on 2026-07-06 — see PLAN.md's Status footnote)

@@ -1,13 +1,13 @@
 <?php
 
-namespace Tatun55\Nawate\Http\Controllers;
+namespace SparrowhawkLabs\Nawate\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-use Tatun55\Nawate\Services\DemoSessionManager;
-use Tatun55\Nawate\Support\StateRecipe;
+use SparrowhawkLabs\Nawate\Services\DemoSessionManager;
+use SparrowhawkLabs\Nawate\Support\StateRecipe;
 
 /**
  * The one entry point a nawate signed link hits: resolve the recipe carried

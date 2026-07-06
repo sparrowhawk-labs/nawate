@@ -1,10 +1,22 @@
 {
-    "name": "tatun55/nawate",
-    "version": "0.1.0",
+    "name": "sparrowhawk-labs/nawate",
     "description": "Nawate — signed-URL state switching for manual demo/verification in Laravel apps. Recipe-based state, per-session SQLite isolation, zero host-app pollution.",
     "type": "library",
-    "license": "proprietary",
-    "keywords": ["laravel", "nawate", "demo", "qa", "state-switching"],
+    "license": "MIT",
+    "homepage": "https://sparrowhawk-labs.dev",
+    "support": {
+        "issues": "https://github.com/sparrowhawk-labs/nawate/issues",
+        "source": "https://github.com/sparrowhawk-labs/nawate"
+    },
+    "authors": [
+        {
+            "name": "Akihiko Takai",
+            "email": "akihiko.takai@yakaze.com",
+            "homepage": "https://sparrowhawk-labs.dev",
+            "role": "Developer"
+        }
+    ],
+    "keywords": ["laravel", "nawate", "demo", "qa", "state-switching", "sparrowhawk-labs"],
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0|^13.0"
@@ -16,18 +28,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Tatun55\\Nawate\\": "src/"
+            "SparrowhawkLabs\\Nawate\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tatun55\\Nawate\\Tests\\": "tests/"
+            "SparrowhawkLabs\\Nawate\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Tatun55\\Nawate\\NawateServiceProvider"
+                "SparrowhawkLabs\\Nawate\\NawateServiceProvider"
             ]
         }
     },

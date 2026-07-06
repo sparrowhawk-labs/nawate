@@ -1,6 +1,6 @@
 <?php
 
-namespace Tatun55\Nawate\Console;
+namespace SparrowhawkLabs\Nawate\Console;
 
 use Illuminate\Console\Command;
 

@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
-use Tatun55\Nawate\Services\DemoSessionManager;
-use Tatun55\Nawate\Support\StateRecipe;
+use SparrowhawkLabs\Nawate\Services\DemoSessionManager;
+use SparrowhawkLabs\Nawate\Support\StateRecipe;
 
-function provisionExpiredSession(): \Tatun55\Nawate\Support\DemoSession
+function provisionExpiredSession(): \SparrowhawkLabs\Nawate\Support\DemoSession
 {
     $session = app(DemoSessionManager::class)->provision(new StateRecipe(fragments: []));
 

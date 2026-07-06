@@ -1,6 +1,6 @@
 <?php
 
-namespace Tatun55\Nawate\Support;
+namespace SparrowhawkLabs\Nawate\Support;
 
 use InvalidArgumentException;
 

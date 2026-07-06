@@ -1,15 +1,15 @@
 <?php
 
-namespace Tatun55\Nawate;
+namespace SparrowhawkLabs\Nawate;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
 use Illuminate\Support\ServiceProvider;
-use Tatun55\Nawate\Console\CleanupCommand;
-use Tatun55\Nawate\Console\InstallCommand;
-use Tatun55\Nawate\FragmentRegistry;
-use Tatun55\Nawate\Http\Middleware\SwitchDemoConnection;
-use Tatun55\Nawate\Services\DemoSessionManager;
+use SparrowhawkLabs\Nawate\Console\CleanupCommand;
+use SparrowhawkLabs\Nawate\Console\InstallCommand;
+use SparrowhawkLabs\Nawate\FragmentRegistry;
+use SparrowhawkLabs\Nawate\Http\Middleware\SwitchDemoConnection;
+use SparrowhawkLabs\Nawate\Services\DemoSessionManager;
 
 class NawateServiceProvider extends ServiceProvider
 {

@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
-use Tatun55\Nawate\Facades\Nawate;
-use Tatun55\Nawate\Services\DemoSessionManager;
-use Tatun55\Nawate\Support\StateRecipe;
+use SparrowhawkLabs\Nawate\Facades\Nawate;
+use SparrowhawkLabs\Nawate\Services\DemoSessionManager;
+use SparrowhawkLabs\Nawate\Support\StateRecipe;
 
 test('provision copies the template, applies fragments, and records a session', function () {
     Nawate::fragment('user:repeat_customer', function () {

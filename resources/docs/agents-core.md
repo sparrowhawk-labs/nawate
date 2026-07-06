@@ -8,7 +8,7 @@ troubleshooting): **`docs/nawate/README.md`**.
 
 ### Core API
 
-- `Tatun55\Nawate\Facades\Nawate::fragment(string $name, Closure $callback)`
+- `SparrowhawkLabs\Nawate\Facades\Nawate::fragment(string $name, Closure $callback)`
   — register a named state fragment, typically from your own
   `AppServiceProvider::boot()`. The closure runs with nawate's isolated demo
   SQLite connection already set as `database.default` — write ordinary

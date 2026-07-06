@@ -22,6 +22,12 @@
 
 > 進め方: 各 Phase のタスクを `- [ ]` → `- [x]` に更新しながら進める。Phase 5 は必ず「人間が実際にブラウザで確認して✅を付ける」ゲートを含む。
 
+> **2026-07-06 追記**: Sparrowhawk Labs の OSS として公開する方針に決定。パッケージ名を
+> `tatun55/nawate` → `sparrowhawk-labs/nawate`、namespace を `Tatun55\Nawate\` →
+> `SparrowhawkLabs\Nawate\`、ライセンスを proprietary → MIT に変更（`pinion-ui`/`pinion-icons`
+> と同一パターン）。以降のこのドキュメント内の `tatun55/nawate` 表記は当時の記録としてそのまま
+> 残す（歴史的事実の書き換えはしない）。
+
 ---
 
 ## 確定済みの設計判断（前段の会話で合意）

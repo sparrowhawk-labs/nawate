@@ -1,11 +1,11 @@
 <?php
 
-namespace Tatun55\Nawate\Tests;
+namespace SparrowhawkLabs\Nawate\Tests;
 
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\TestCase as Orchestra;
 use PDO;
-use Tatun55\Nawate\NawateServiceProvider;
+use SparrowhawkLabs\Nawate\NawateServiceProvider;
 
 class TestCase extends Orchestra
 {

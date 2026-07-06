@@ -1,14 +1,14 @@
 <?php
 
-namespace Tatun55\Nawate\Services;
+namespace SparrowhawkLabs\Nawate\Services;
 
 use Closure;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
-use Tatun55\Nawate\FragmentRegistry;
-use Tatun55\Nawate\Support\DemoSession;
-use Tatun55\Nawate\Support\StateRecipe;
+use SparrowhawkLabs\Nawate\FragmentRegistry;
+use SparrowhawkLabs\Nawate\Support\DemoSession;
+use SparrowhawkLabs\Nawate\Support\StateRecipe;
 
 /**
  * Provisions per-session demo SQLite copies and switches the runtime default

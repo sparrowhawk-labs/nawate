@@ -1,11 +1,11 @@
 <?php
 
-namespace Tatun55\Nawate\Facades;
+namespace SparrowhawkLabs\Nawate\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\URL;
-use Tatun55\Nawate\FragmentRegistry;
-use Tatun55\Nawate\Support\StateRecipe;
+use SparrowhawkLabs\Nawate\FragmentRegistry;
+use SparrowhawkLabs\Nawate\Support\StateRecipe;
 
 /**
  * @method static void fragment(string $name, \Closure $callback)

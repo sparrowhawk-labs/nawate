@@ -1,10 +1,10 @@
 <?php
 
-namespace Tatun55\Nawate\Http\Middleware;
+namespace SparrowhawkLabs\Nawate\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Tatun55\Nawate\Services\DemoSessionManager;
+use SparrowhawkLabs\Nawate\Services\DemoSessionManager;
 
 /**
  * Runs on every 'web' request (only while nawate.enabled). Reads the demo

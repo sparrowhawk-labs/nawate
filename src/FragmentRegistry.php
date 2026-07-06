@@ -1,6 +1,6 @@
 <?php
 
-namespace Tatun55\Nawate;
+namespace SparrowhawkLabs\Nawate;
 
 use Closure;
 use InvalidArgumentException;
