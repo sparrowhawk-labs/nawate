@@ -36,6 +36,12 @@ troubleshooting): **`docs/nawate/README.md`**.
    enabled. The demo-DB connection swap happens mid-request-pipeline; a
    DB-backed session store can desync across requests as a result (found and
    fixed empirically — see the full docs for why).
+6. **Fragments run on SQLite, whatever your production DB engine is.** A
+   fragment that calls a MySQL/PostgreSQL-only SQL feature (FULLTEXT
+   `MATCH`/`AGAINST`, `RAND()`, a JSON operator, a stored procedure) fails at
+   provisioning time with `FragmentExecutionException`, naming the fragment
+   and — when the signature is recognizable (`no such function: …`) —
+   flagging the likely cause. See "Requirements" in the full docs.
 
 ### Cleanup
 

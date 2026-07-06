@@ -288,3 +288,13 @@ php artisan vendor:publish --tag=nawate-lang
   demoing** — check `SESSION_DRIVER`; see "The session-driver gotcha" above.
 - **Link 403s immediately** — either past `signed_url_ttl` or the URL was
   edited/truncated (breaks the HMAC signature). Generate a new link.
+- **`FragmentExecutionException: … threw while running against the demo
+  SQLite connection`** — the wrapped original error names the real cause.
+  If it also says *"looks like a MySQL/PostgreSQL-specific SQL feature"*,
+  a fragment called something SQLite doesn't implement (`RAND()`,
+  `MATCH`/`AGAINST` FULLTEXT search, a JSON operator, a stored procedure
+  `CALL`, …) — see "Requirements" above; that fragment's query needs a
+  SQLite-compatible rewrite (e.g. `RAND()` → `RANDOM()`) to run through
+  nawate at all. Without that specific signature, treat it as an ordinary
+  bug in the fragment — the exception's `getPrevious()` has the original
+  exception if you need to inspect it further.

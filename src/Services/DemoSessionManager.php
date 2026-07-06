@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
+use SparrowhawkLabs\Nawate\Exceptions\FragmentExecutionException;
 use SparrowhawkLabs\Nawate\FragmentRegistry;
 use SparrowhawkLabs\Nawate\Support\DemoSession;
 use SparrowhawkLabs\Nawate\Support\StateRecipe;
@@ -54,7 +55,16 @@ class DemoSessionManager
         // not leave global state switched.
         $this->withDemoConnection($connection, $targetPath, function () use ($recipe) {
             foreach ($recipe->fragments as $name) {
-                ($this->fragments->get($name))();
+                // Let an unregistered-name lookup fail as itself (a config/
+                // typo error, not a runtime failure) — only the closure's
+                // own execution gets wrapped with fragment-attributed context.
+                $callback = $this->fragments->get($name);
+
+                try {
+                    $callback();
+                } catch (\Throwable $e) {
+                    throw FragmentExecutionException::forFragment($name, $e);
+                }
             }
         });
 

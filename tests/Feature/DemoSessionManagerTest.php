@@ -60,3 +60,43 @@ test('unregistered fragment name throws instead of silently no-op-ing', function
     expect(fn () => $manager->provision(new StateRecipe(fragments: ['does:not-exist'])))
         ->toThrow(InvalidArgumentException::class);
 });
+
+test('a fragment calling a MySQL-only function fails with a clear, attributed error', function () {
+    Nawate::fragment('search:rand', function () {
+        // RAND() is MySQL's random function (SQLite's equivalent is
+        // RANDOM()) — SQLite has no function by this name, so this
+        // reproduces "wrote MySQL-only SQL into a fragment" without
+        // needing a real MySQL server.
+        DB::select('select RAND() as r');
+    });
+
+    $manager = app(DemoSessionManager::class);
+
+    try {
+        $manager->provision(new StateRecipe(fragments: ['search:rand']));
+        $this->fail('Expected FragmentExecutionException to be thrown.');
+    } catch (\SparrowhawkLabs\Nawate\Exceptions\FragmentExecutionException $e) {
+        expect($e->getMessage())->toContain("fragment 'search:rand'");
+        expect($e->getMessage())->toContain('MySQL/PostgreSQL-specific SQL feature');
+        expect($e->getMessage())->toContain('RAND');
+        expect($e->getPrevious())->toBeInstanceOf(\Illuminate\Database\QueryException::class);
+    }
+});
+
+test('a fragment with an ordinary bug still throws its original exception type via the wrapper', function () {
+    Nawate::fragment('broken:typo', function () {
+        DB::table('no_such_table_at_all')->insert(['x' => 1]);
+    });
+
+    $manager = app(DemoSessionManager::class);
+
+    try {
+        $manager->provision(new StateRecipe(fragments: ['broken:typo']));
+        $this->fail('Expected FragmentExecutionException to be thrown.');
+    } catch (\SparrowhawkLabs\Nawate\Exceptions\FragmentExecutionException $e) {
+        // No "no such function" signature here, so no engine-incompatibility
+        // guess is appended — the original DB error still comes through.
+        expect($e->getMessage())->toContain("fragment 'broken:typo'");
+        expect($e->getMessage())->not->toContain('MySQL/PostgreSQL-specific');
+    }
+});
