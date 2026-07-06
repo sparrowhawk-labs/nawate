@@ -24,6 +24,7 @@ class NawateServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'nawate');
 
         // Inert unless explicitly enabled — no route, no middleware, no
         // exception handling registered at all in the disabled state.
@@ -46,14 +47,22 @@ class NawateServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../README.md' => base_path('docs/nawate/README.md'),
             ], 'nawate-docs');
+
+            $this->publishes([
+                __DIR__ . '/../resources/lang' => $this->app->langPath('vendor/nawate'),
+            ], 'nawate-lang');
         }
     }
 
     /**
      * A signed nawate link that's expired or been tampered with throws
      * Laravel's built-in InvalidSignatureException (plain 403 by default).
-     * Replace that with a plain-language Japanese explanation, scoped to
-     * the nawate route only — everything else keeps default handling.
+     * Replace that with a plain-language explanation, scoped to the nawate
+     * route only — everything else keeps default handling. Text follows the
+     * app's current locale (`app()->getLocale()`, driven by `APP_LOCALE` /
+     * `config('app.locale')`) via nawate's own translation files
+     * (`nawate::messages.*`, English + Japanese shipped; publish
+     * `--tag=nawate-lang` to add more or override wording).
      */
     private function registerExpiredLinkPage(): void
     {
@@ -64,13 +73,14 @@ class NawateServiceProvider extends ServiceProvider
                 }
 
                 $ttl = (int) config('nawate.signed_url_ttl', 60);
+                $locale = e(app()->getLocale());
 
                 return response(
-                    '<!doctype html><html lang="ja"><head><meta charset="utf-8">'
-                    . '<title>nawate: リンクが無効です</title></head>'
+                    "<!doctype html><html lang=\"{$locale}\"><head><meta charset=\"utf-8\">"
+                    . '<title>' . e(__('nawate::messages.expired_title')) . '</title></head>'
                     . '<body style="font-family: sans-serif; padding: 2rem; max-width: 40rem;">'
-                    . '<h1>このデモ状態切替リンクは無効です</h1>'
-                    . "<p>署名が不正か、有効期限（{$ttl}分）が切れています。リンクを発行し直してください。</p>"
+                    . '<h1>' . e(__('nawate::messages.expired_heading')) . '</h1>'
+                    . '<p>' . e(__('nawate::messages.expired_body', ['ttl' => $ttl])) . '</p>'
                     . '</body></html>',
                     403,
                 );

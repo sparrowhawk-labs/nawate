@@ -230,12 +230,26 @@ Schedule::command('nawate:cleanup')->hourly();
 
 ## Safety
 
-Production では `NAWATE_ENABLED` を明示的に true にしない限り、ルート自体が
-一切登録されない（デフォルト無効・opt-in方式）。 Signed URLs otherwise carry no
+No route is registered at all in production unless `NAWATE_ENABLED` is
+explicitly set to `true` (disabled by default, opt-in only). Signed URLs otherwise carry no
 authentication of their own — anyone who obtains a link's URL can use it
 (impersonation risk is the tradeoff for zero host-app-code integration).
 Treat links as sensitive as the state they grant, and keep `signed_url_ttl`
 tight in anything reachable outside a trusted network.
+
+## Localization
+
+The expired/tampered-link 403 page follows the host app's own locale —
+`app()->getLocale()`, i.e. `config('app.locale')` / `APP_LOCALE` — the same
+setting that drives every other Laravel translation. English and Japanese
+are shipped (`resources/lang/{en,ja}/messages.php`); an unset or unshipped
+locale falls back to `config('app.fallback_locale')` per normal Laravel
+behavior. To add a language or override wording:
+
+```bash
+php artisan vendor:publish --tag=nawate-lang
+# edit lang/vendor/nawate/{locale}/messages.php
+```
 
 ## Troubleshooting
 

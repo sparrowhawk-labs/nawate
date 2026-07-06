@@ -46,7 +46,17 @@ test('a signed nawate link provisions, switches, logs in, and lands on the targe
         ->assertJson(['authenticated_as' => 1, 'name' => 'Alice']);
 });
 
-test('a tampered link is rejected with a plain-language Japanese message', function () {
+test('a tampered link is rejected with a plain-language message in the app locale (default: English)', function () {
+    $url = Nawate::link(['user:repeat_customer'], '/cart', userId: 1) . 'x';
+
+    $this->get($url)
+        ->assertStatus(403)
+        ->assertSee('no longer valid', false);
+});
+
+test('the expired-link page follows config(app.locale) — Japanese when set', function () {
+    config(['app.locale' => 'ja']);
+
     $url = Nawate::link(['user:repeat_customer'], '/cart', userId: 1) . 'x';
 
     $this->get($url)
