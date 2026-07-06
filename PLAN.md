@@ -18,7 +18,7 @@
 | 2 | コア機構（状態レシピ・DB分離） | ✅ 完了 |
 | 3 | URL層（署名付きリンク・リダイレクト） | ✅ 完了 |
 | 4 | クリーンアップ機構 | ✅ 完了 |
-| 5 | 最小デモアプリでの段階的手動検証 | ⬜ 未着手 |
+| 5 | 最小デモアプリでの段階的手動検証 | ✅ 完了 |
 
 > 進め方: 各 Phase のタスクを `- [ ]` → `- [x]` に更新しながら進める。Phase 5 は必ず「人間が実際にブラウザで確認して✅を付ける」ゲートを含む。
 
@@ -123,23 +123,24 @@ NawateController（ホストアプリの業務コードから完全分離）
 
 ### 準備
 
-- [ ] 最小デモアプリ scaffold（`nawate-demo-app` 等、TALL stack最小構成）
-- [ ] デモ用の題材を用意: 簡単な「ECもどき」— ユーザー(新規/リピーター)・購入状態(未購入/購入済み)・カート中身(空/あり)の3軸
-- [ ] 対応する Seeder + static helper をデモアプリ側に実装（`UserSeeder::asNewUser()/asRepeatCustomer()`, `PurchaseSeeder::afterCompleted()`, `CartSeeder::withItems()` 等）
-- [ ] `nawate` を path repository 経由で導入、`nawate:install` 実行
+- [x] 最小デモアプリ scaffold（`nawate-demo-app`、Laravel 13 + Livewire 4 + SQLite、`~/project/nawate-demo-app`）
+- [x] デモ用の題材を用意: 簡単な「ECもどき」— ユーザー(新規/リピーター)・購入状態(未購入/購入済み)・カート中身(空/あり)の3軸（`app/Models/{User,Purchase,Cart}.php`、`/shop` Livewireページ）
+- [x] 対応する Seeder + static helper をデモアプリ側に実装（`database/seeders/{UserSeeder,PurchaseSeeder,CartSeeder}.php` — `UserSeeder::asNewUser()/asRepeatCustomer()`, `PurchaseSeeder::afterCompleted()`, `CartSeeder::withItems()`）
+- [x] `nawate` を path repository 経由で導入、`nawate:install` 実行（`app/Providers/AppServiceProvider.php` で4 fragment登録: `user:new`/`user:repeat`/`purchase:completed`/`cart:with_items`）
 
 ### 段階的デモ
 
-- [ ] **Demo 1（単純系）**: fragment 1つだけの状態切替リンクを踏み、ゲストユーザー・カート空の画面が出ることを確認
-- [ ] **Demo 2（認証込み）**: 特定ユーザーとしてログインされた状態に切り替わることを確認
-- [ ] **Demo 3（合成）**: `user:repeat_customer + purchase:completed + cart:has_items` の3fragment合成が正しく反映されることを確認
-- [ ] **Demo 4（DB分離）**: 2つの別々の状態切替リンクをブラウザの別タブで同時に開き、互いに干渉しないことを確認
-- [ ] **Demo 5（クリーンアップ）**: TTLを短く設定した状態でセッションを作り、`nawate:cleanup` 実行後にファイル・レコードが消えることを確認
-- [ ] **Demo 6（統合・任意）**: `e2e-demo-video` スキルで撮影した動画のシーン説明に、nawateのリンクを手動で埋め込み、動画→実際の状態へジャンプする一気通貫の体験を確認
+- [x] **Demo 1（単純系）**: fragment 1つだけの状態切替リンクを踏み、ゲストユーザー・カート空の画面が出ることを確認 — **2026-07-06 人間ゲート✅**
+- [x] **Demo 2（認証込み）**: 特定ユーザーとしてログインされた状態に切り替わることを確認 — **2026-07-06 人間ゲート✅**
+- [x] **Demo 3（合成）**: `user:repeat + purchase:completed + cart:with_items` の3fragment合成が正しく反映されることを確認 — **2026-07-06 人間ゲート✅**
+- [x] **Demo 4（DB分離）**: 2つの別々の状態切替リンクをブラウザの別タブで同時に開き、互いに干渉しないことを確認 — **2026-07-06 人間ゲート✅**
+- [x] **Demo 5（クリーンアップ）**: TTLを短く設定した状態でセッションを作り、`nawate:cleanup` 実行後にファイル・レコードが消えることを確認 — **2026-07-06 人間ゲート✅**
+- [ ] **Demo 6（統合・任意）**: `e2e-demo-video` スキルで撮影した動画のシーン説明に、nawateのリンクを手動で埋め込み、動画→実際の状態へジャンプする一気通貫の体験を確認（任意・未実施）
 
 ### 完了条件
 
-- Demo 1〜5が全て✅。Demo 6は任意（本パッケージの本スコープ外だが、実用性の最終確認として推奨）。
+- [x] **2026-07-06 検証済み**: Demo 1〜5全て✅（レビューページ: `nawate-demo-app/docs/visualized/nawate-phase5.html`、スクリーンショット: `nawate-demo-app/.screenshots/`）。Demo 6は任意のため未実施（本パッケージの本スコープ外）。
+- **セッション周りの追加知見**: デモアプリの `SESSION_DRIVER` は `database`（Laravel既定）のままだと、nawateのDB接続切替タイミングとの相互作用でログインセッションがリクエスト間で不整合になりうるため、`file` ドライバに変更して検証した（nawate本体には変更なし。ホストアプリがセッションをDB接続経由で持つ場合の既知の注意点として記録）。
 
 ---
 
